@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html>
 <body>
+<div id="wrapper">
+
 <h1>Chat</h1>
 <div id="chat"></div>
 <input id="msg" type="text">
+<ul id="smiles"></ul>
 <style>
-input { border: 1px solid green; }
+input { border: 1px solid green; width: 100%;}
+#smiles{display : block; padding: 0px;}
+#smiles li{list-style-type : none; float : left; max-width : 100px;}
+#wrapper {width: 300px;}
+#chat {word-break: break-all;}
 </style>
 <script>
-
   var chat = document.getElementById('chat'),
-      msg = document.getElementById('msg');
+      msg = document.getElementById('msg'),
+      smiles = document.getElementById('smiles');
   msg.focus();
 
   msg.addEventListener('keydown', function(event) {
     if (event.keyCode === 13) {
       var s = msg.value;
       msg.value = '';
-      writeLine(s);
       socket.send(s);
     }
   });
-
   function writeLine(text) {
     var line = document.createElement('div');
     line.innerHTML = '<p>' + text + '</p>';
@@ -39,9 +44,37 @@ input { border: 1px solid green; }
   };
 
   socket.onmessage = function(event) {
-    writeLine(event.data);
+    var data = JSON.parse(event.data);
+    switch (data['type']) {
+      case 'message':
+        writeLine(data['data']);
+        break
+      case 'smiles': {
+        console.log('Received: ' + data['data']);
+        var smiles = data['data'];
+        var smilesDiv = document.getElementById("smiles");
+        smiles.forEach(function (smileFilename) {
+          var smileLi = document.createElement('li');
+          smileLi.innerHTML += '<img src="' + smileFilename + '" />';
+          smileLi.onclick = function() {
+            document.getElementById('msg').value += ':' + smileFilename.substring(smileFilename.lastIndexOf('/') + 1, smileFilename.lastIndexOf('.')) + ':';
+          }
+          smilesDiv.appendChild(smileLi);
+        });
+        }
+        break
+      case 'connected': {
+        writeLine(data['data'] + ' connected');
+      }
+      break
+      case 'disconnected': {
+        writeLine(data['data'] + ' disconnected');
+      }
+      break
+    }
   };
 
 </script>
+</div>
 </body>
 </html>
