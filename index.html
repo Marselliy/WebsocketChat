@@ -11,8 +11,9 @@
 input { border: 1px solid green; width: 100%;}
 #smiles{display : block; padding: 0px;}
 #smiles li{list-style-type : none; float : left; max-width : 100px;}
-#wrapper {width: 300px;}
+#wrapper {width: 250px;}
 #chat {word-break: break-all;}
+#nickname_label:hover {background: #000 !important}
 </style>
 <script>
   var chat = document.getElementById('chat'),
@@ -46,8 +47,10 @@ input { border: 1px solid green; width: 100%;}
   socket.onmessage = function(event) {
     var data = JSON.parse(event.data);
     switch (data['type']) {
-      case 'message':
-        writeLine(data['data']);
+      case 'message': {
+        var title = 'Anonymous ' + data['label']['label'].substring(data['label']['label'].lastIndexOf('\\') + 1, data['label']['label'].lastIndexOf('.'));
+        writeLine('<img id="nickname_label" src="' + data['label']['label'] + '" title = "' + title + '" width = "24px" height = "24px" style="background: ' + data['label']['color'] + '"' + '/> ' + data['data']);
+      }
         break
       case 'smiles': {
         console.log('Received: ' + data['data']);
@@ -64,11 +67,13 @@ input { border: 1px solid green; width: 100%;}
         }
         break
       case 'connected': {
-        writeLine(data['data'] + ' connected');
+        var title = 'Anonymous ' + data['data']['label'].substring(data['data']['label'].lastIndexOf('\\') + 1, data['data']['label'].lastIndexOf('.'));
+        writeLine('<img id="nickname_label" src="' + data['data']['label'] + '" title = "' + title + '" width = "24px" height = "24px" style="background: ' + data['data']['color'] + '"' + '/> connected');
       }
       break
       case 'disconnected': {
-        writeLine(data['data'] + ' disconnected');
+        var title = 'Anonymous ' + data['data']['label'].substring(data['data']['label'].lastIndexOf('\\') + 1, data['data']['label'].lastIndexOf('.'));
+        writeLine('<img id="nickname_label" src="' + data['data']['label'] + '" title = "' + title + '" width = "24px" height = "24px" style="background: ' + data['data']['color'] + '"' + '/> disconnected');
       }
       break
     }

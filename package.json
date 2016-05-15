@@ -5,7 +5,8 @@
   "description": "Websocket Chat Example",
   "license": "MIT",
   "dependencies": {
-    "websocket": "1.0.x"
+    "websocket": "1.0.x",
+    "linkifyjs": "2.0.x"
   },
   "readmeFilename": "README.md"
 }
